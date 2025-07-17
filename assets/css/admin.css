@@ -1,0 +1,734 @@
+/**
+ * Admin styly pro Distance Based Shipping plugin.
+ *
+ * Soubor: assets/css/admin.css
+ */
+
+/* ==========================================================================
+   Obecné admin styly
+   ========================================================================== */
+
+.dbs-admin-content {
+  max-width: 1200px;
+}
+
+.dbs-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.dbs-page-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.dbs-page-header .dashicons {
+  font-size: 24px;
+  color: #0073aa;
+}
+
+/* ==========================================================================
+   Sekce a karty
+   ========================================================================== */
+
+.dbs-overview-section,
+.dbs-quick-actions-section,
+.dbs-help-section,
+.dbs-settings-section,
+.dbs-form-section {
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.dbs-settings-section h2,
+.dbs-form-section h2 {
+  margin-top: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  color: #23282d;
+}
+
+.dbs-settings-section .description,
+.dbs-form-section .description {
+  margin-top: 0;
+  color: #666;
+}
+
+/* ==========================================================================
+   Statistiky a přehled
+   ========================================================================== */
+
+.dbs-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.dbs-stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.dbs-stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.dbs-stat-number {
+  font-size: 2.5em;
+  font-weight: bold;
+  margin-bottom: 5px;
+  line-height: 1;
+}
+
+.dbs-stat-label {
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   Rychlé akce
+   ========================================================================== */
+
+.dbs-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.dbs-action-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background: #fafafa;
+  transition: box-shadow 0.2s ease;
+}
+
+.dbs-action-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dbs-action-card h3 {
+  margin-top: 0;
+  color: #23282d;
+}
+
+.dbs-action-card p {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+/* ==========================================================================
+   Nápověda
+   ========================================================================== */
+
+.dbs-help-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.dbs-help-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background: #f9f9f9;
+}
+
+.dbs-help-card h4 {
+  margin-top: 0;
+  color: #23282d;
+}
+
+.dbs-help-card ul,
+.dbs-help-card ol {
+  color: #666;
+}
+
+/* ==========================================================================
+   Modaly
+   ========================================================================== */
+
+.dbs-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dbs-modal-content {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dbs-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.dbs-modal-header h3 {
+  margin: 0;
+}
+
+.dbs-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s ease;
+}
+
+.dbs-modal-close:hover {
+  color: #000;
+}
+
+.dbs-modal-body {
+  padding: 20px;
+}
+
+.dbs-modal-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   Prázdné stavy
+   ========================================================================== */
+
+.dbs-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+.dbs-empty-state-icon {
+  font-size: 64px;
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+.dbs-empty-state h3 {
+  margin: 0 0 10px 0;
+  color: #555;
+}
+
+.dbs-empty-state p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   Stavy a oznámení
+   ========================================================================== */
+
+.dbs-status {
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.dbs-status-active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.dbs-status-inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.dbs-status-warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* ==========================================================================
+   API test výsledky
+   ========================================================================== */
+
+.dbs-api-test-result {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.dbs-api-test-result.success {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.dbs-api-test-result.error {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+/* ==========================================================================
+   Formuláře
+   ========================================================================== */
+
+.dbs-form-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dbs-form-actions {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.required {
+  color: #d63638;
+}
+
+.button-link-delete {
+  color: #d63638 !important;
+  margin-left: auto;
+  text-decoration: none;
+}
+
+.button-link-delete:hover,
+.button-link-delete:focus {
+  color: #a02622 !important;
+}
+
+/* ==========================================================================
+   Kontroly a seznamy
+   ========================================================================== */
+
+.dbs-checkbox-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  background: #fafafa;
+}
+
+.dbs-checkbox-item {
+  display: block;
+  margin-bottom: 8px;
+  padding: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.dbs-checkbox-item:hover {
+  background: #f0f0f0;
+  border-radius: 3px;
+}
+
+.dbs-checkbox-item input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* ==========================================================================
+   Kalkulátor sazeb
+   ========================================================================== */
+
+.dbs-rate-calculator {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.dbs-rate-calculator h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #495057;
+}
+
+#calc_result {
+  margin-top: 10px;
+  padding: 8px;
+  background: #e8f5e8;
+  border: 1px solid #c3e6cb;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.active-rate-field {
+  border-color: #007cba !important;
+  box-shadow: 0 0 0 1px #007cba !important;
+}
+
+/* ==========================================================================
+   Tabulky
+   ========================================================================== */
+
+.dbs-no-coordinates {
+  color: #999;
+  font-style: italic;
+}
+
+.column-coordinates {
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.column-distance,
+.column-rates,
+.column-conditions {
+  font-size: 13px;
+}
+
+.column-rates > div {
+  margin-bottom: 2px;
+}
+
+.column-priority {
+  text-align: center;
+  font-weight: bold;
+}
+
+/* ==========================================================================
+   Ovládací prvky
+   ========================================================================== */
+
+.dbs-stores-controls,
+.dbs-rules-controls {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.dbs-bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dbs-rules-help {
+  margin: 20px 0;
+  padding: 15px;
+  background: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Geocoding výsledky
+   ========================================================================== */
+
+#dbs-geocoding-result,
+#dbs-test-result {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f0f8ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 4px;
+}
+
+.dbs-geocoding-success {
+  color: #155724;
+  background: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.dbs-geocoding-error {
+  color: #721c24;
+  background: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+/* ==========================================================================
+   Mapa
+   ========================================================================== */
+
+#dbs-store-map {
+  height: 300px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f5f5f5;
+}
+
+/* ==========================================================================
+   Loading stavy
+   ========================================================================== */
+
+.dbs-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.dbs-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  animation: dbs-spin 2s linear infinite;
+}
+
+@keyframes dbs-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Responzivní design
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  .dbs-admin-content {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 782px) {
+  .dbs-page-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .dbs-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dbs-actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dbs-help-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dbs-bulk-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dbs-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dbs-form-actions .button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .button-link-delete {
+    margin-left: 0;
+    order: 3;
+  }
+
+  .dbs-checkbox-list {
+    max-height: 150px;
+  }
+
+  .dbs-modal-content {
+    width: 95%;
+    margin: 20px;
+  }
+
+  .dbs-modal-actions {
+    flex-direction: column;
+  }
+
+  .dbs-modal-actions .button {
+    width: 100%;
+  }
+
+  .column-rates > div {
+    display: inline-block;
+    margin-right: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .dbs-overview-section,
+  .dbs-quick-actions-section,
+  .dbs-help-section,
+  .dbs-settings-section,
+  .dbs-form-section {
+    padding: 15px;
+  }
+
+  .dbs-stat-number {
+    font-size: 2em;
+  }
+
+  .dbs-action-card,
+  .dbs-help-card {
+    padding: 15px;
+  }
+}
+
+/* ==========================================================================
+   Tmavý režim (pro budoucí kompatibilitu)
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  .dbs-stat-card {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  }
+
+  .dbs-action-card,
+  .dbs-help-card {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+
+  .dbs-action-card h3,
+  .dbs-help-card h4 {
+    color: #e2e8f0;
+  }
+
+  .dbs-action-card p,
+  .dbs-help-card ul,
+  .dbs-help-card ol {
+    color: #a0aec0;
+  }
+}
+
+/* ==========================================================================
+   Animace a přechody
+   ========================================================================== */
+
+.dbs-stat-card,
+.dbs-action-card,
+.dbs-help-card {
+  transition: all 0.2s ease;
+}
+
+.dbs-modal {
+  animation: dbs-modal-fade-in 0.3s ease;
+}
+
+.dbs-modal-content {
+  animation: dbs-modal-slide-in 0.3s ease;
+}
+
+@keyframes dbs-modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dbs-modal-slide-in {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   Utility třídy
+   ========================================================================== */
+
+.dbs-text-center {
+  text-align: center;
+}
+
+.dbs-text-left {
+  text-align: left;
+}
+
+.dbs-text-right {
+  text-align: right;
+}
+
+.dbs-hidden {
+  display: none !important;
+}
+
+.dbs-visible {
+  display: block !important;
+}
+
+.dbs-flex {
+  display: flex;
+}
+
+.dbs-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dbs-gap-10 {
+  gap: 10px;
+}
+
+.dbs-gap-20 {
+  gap: 20px;
+}
+
+.dbs-mt-20 {
+  margin-top: 20px;
+}
+
+.dbs-mb-20 {
+  margin-bottom: 20px;
+}
+
+.dbs-p-20 {
+  padding: 20px;
+}

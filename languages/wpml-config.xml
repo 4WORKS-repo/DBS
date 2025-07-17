@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wpml-config>
+    <language-switcher-settings>
+        <key name="distance_shipping_calculator">
+            <key name="template">distance-shipping-calculator.php</key>
+        </key>
+    </language-switcher-settings>
+
+    <!-- Plugin strings -->
+    <admin-texts>
+        <key name="dbs_map_service">
+            <key name="openstreetmap" />
+            <key name="google" />
+            <key name="bing" />
+        </key>
+        <key name="dbs_distance_unit">
+            <key name="km" />
+            <key name="miles" />
+        </key>
+    </admin-texts>
+
+    <!-- Custom fields translation -->
+    <custom-fields>
+        <custom-field action="copy">rule_name</custom-field>
+        <custom-field action="copy">distance_from</custom-field>
+        <custom-field action="copy">distance_to</custom-field>
+        <custom-field action="copy">base_rate</custom-field>
+        <custom-field action="copy">per_km_rate</custom-field>
+        <custom-field action="copy">min_order_amount</custom-field>
+        <custom-field action="copy">max_order_amount</custom-field>
+        <custom-field action="copy">product_categories</custom-field>
+        <custom-field action="copy">shipping_classes</custom-field>
+        <custom-field action="copy">priority</custom-field>
+        <custom-field action="copy">is_active</custom-field>
+    </custom-fields>
+
+    <!-- Shortcodes -->
+    <shortcodes>
+        <shortcode>
+            <tag>dbs_shipping_calculator</tag>
+            <attributes>
+                <attribute>title</attribute>
+                <attribute>placeholder</attribute>
+            </attributes>
+        </shortcode>
+    </shortcodes>
+</wpml-config>

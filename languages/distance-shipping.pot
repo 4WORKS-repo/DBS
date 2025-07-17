@@ -1,0 +1,282 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Distance Based Shipping for WooCommerce 1.0.0\n"
+"Report-Msgid-Bugs-To: https://your-website.com/support\n"
+"POT-Creation-Date: 2024-01-01 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Domain: distance-shipping\n"
+
+#: distance-based-shipping.php:95
+msgid "Distance Based Shipping requires WooCommerce to be installed and activated."
+msgstr ""
+
+#: includes/functions/database-functions.php:108
+msgid "Hlavní obchod"
+msgstr ""
+
+#: includes/functions/admin-functions.php:35
+msgid "Distance Shipping"
+msgstr ""
+
+#: includes/functions/admin-functions.php:45
+msgid "Settings"
+msgstr ""
+
+#: includes/functions/admin-functions.php:54
+msgid "Store Locations"
+msgstr ""
+
+#: includes/functions/admin-functions.php:63
+msgid "Shipping Rules"
+msgstr ""
+
+#: includes/functions/admin-functions.php:85
+msgid "Please configure your Google Maps API key in the <a href=\"%s\">settings</a> to enable distance calculation."
+msgstr ""
+
+#: includes/functions/admin-functions.php:95
+msgid "Please configure your Bing Maps API key in the <a href=\"%s\">settings</a> to enable distance calculation."
+msgstr ""
+
+#: includes/functions/admin-functions.php:147
+msgid "Store was not found."
+msgstr ""
+
+#: includes/functions/admin-functions.php:183
+msgid "Rule was not found."
+msgstr ""
+
+#: includes/functions/admin-functions.php:206
+msgid "Settings saved successfully!"
+msgstr ""
+
+#: includes/functions/admin-functions.php:239
+msgid "Security check failed."
+msgstr ""
+
+#: includes/functions/admin-functions.php:275
+msgid "Security check failed."
+msgstr ""
+
+#: includes/functions/shipping-functions.php:280
+msgid "Standard Shipping"
+msgstr ""
+
+#: includes/functions/distance-functions.php:143
+msgid "Google Maps API klíč není nakonfigurován"
+msgstr ""
+
+#: includes/functions/distance-functions.php:184
+msgid "Google Maps API požadavek selhal: %s"
+msgstr ""
+
+#: includes/functions/distance-functions.php:191
+msgid "Google Maps API vrátilo neplatnou odpověď: %s"
+msgstr ""
+
+#: includes/functions/distance-functions.php:213
+msgid "Bing Maps API klíč není nakonfigurován"
+msgstr ""
+
+#: includes/functions/distance-functions.php:253
+msgid "Bing Maps API požadavek selhal: %s"
+msgstr ""
+
+#: includes/functions/distance-functions.php:260
+msgid "Bing Maps API vrátilo neplatnou odpověď: %s"
+msgstr ""
+
+#: includes/functions/distance-functions.php:290
+msgid "OpenStreetMap Nominatim API požadavek selhal: %s"
+msgstr ""
+
+#: includes/functions/distance-functions.php:297
+msgid "OpenStreetMap Nominatim API nevrátilo platné souřadnice pro: %s"
+msgstr ""
+
+#: includes/functions/geocoding-functions.php:75
+msgid "Google Maps API klíč není nakonfigurován pro geokódování"
+msgstr ""
+
+#: includes/functions/geocoding-functions.php:102
+msgid "Google Geocoding API požadavek selhal: %s"
+msgstr ""
+
+#: includes/functions/geocoding-functions.php:109
+msgid "Google Geocoding API nevrátilo platné souřadnice pro: %s"
+msgstr ""
+
+#: includes/functions/geocoding-functions.php:131
+msgid "Bing Maps API klíč není nakonfigurován pro geokódování"
+msgstr ""
+
+#: includes/functions/geocoding-functions.php:150
+msgid "Bing Geocoding API požadavek selhal: %s"
+msgstr ""
+
+#: includes/functions/geocoding-functions.php:157
+msgid "Bing Geocoding API nevrátilo platné souřadnice pro: %s"
+msgstr ""
+
+#: includes/functions/geocoding-functions.php:185
+msgid "OpenStreetMap Nominatim API požadavek selhal: %s"
+msgstr ""
+
+#: includes/functions/geocoding-functions.php:192
+msgid "OpenStreetMap Nominatim API nevrátilo platné souřadnice pro: %s"
+msgstr ""
+
+#: includes/functions/ajax-functions.php:45
+msgid "Bezpečnostní kontrola selhala."
+msgstr ""
+
+#: includes/functions/ajax-functions.php:51
+msgid "Nemáte oprávnění k této akci."
+msgstr ""
+
+#: includes/functions/ajax-functions.php:56
+msgid "Adresa je povinná."
+msgstr ""
+
+#: includes/functions/ajax-functions.php:64
+msgid "Adresa byla úspěšně geokódována."
+msgstr ""
+
+#: includes/functions/ajax-functions.php:70
+msgid "Nepodařilo se geokódovat adresu."
+msgstr ""
+
+#: includes/functions/ajax-functions.php:84
+msgid "Bezpečnostní kontrola selhala."
+msgstr ""
+
+#: includes/functions/ajax-functions.php:90
+msgid "Nemáte oprávnění k této akci."
+msgstr ""
+
+#: includes/functions/ajax-functions.php:95
+msgid "Výchozí i cílová adresa jsou povinné."
+msgstr ""
+
+#: includes/functions/ajax-functions.php:104
+msgid "Vzdálenost byla úspěšně vypočítána."
+msgstr ""
+
+#: includes/functions/ajax-functions.php:113
+msgid "Nepodařilo se vypočítat vzdálenost."
+msgstr ""
+
+#: includes/class-dbs-shipping-method.php:37
+msgid "Distance Based Shipping"
+msgstr ""
+
+#: includes/class-dbs-shipping-method.php:38
+msgid "Výpočet ceny dopravy na základě vzdálenosti mezi prodejnou a adresou zákazníka."
+msgstr ""
+
+#: includes/class-dbs-shipping-method.php:67
+msgid "Enable/Disable"
+msgstr ""
+
+#: includes/class-dbs-shipping-method.php:70
+msgid "Enable Distance Based Shipping"
+msgstr ""
+
+#: includes/class-dbs-shipping-method.php:75
+msgid "Název metody"
+msgstr ""
+
+#: includes/class-dbs-shipping-method.php:78
+msgid "This controls the title which the user sees during checkout."
+msgstr ""
+
+#: includes/class-dbs-shipping-method.php:79
+msgid "Distance Based Shipping"
+msgstr ""
+
+#: admin/views/main-page.php:29
+msgid "Distance Based Shipping"
+msgstr ""
+
+#: admin/views/main-page.php:33
+msgid "Přehled"
+msgstr ""
+
+#: admin/views/main-page.php:35
+msgid "Tento plugin vypočítává dopravní sazby na základě vzdálenosti mezi vašimi obchody a adresami zákazníků."
+msgstr ""
+
+#: admin/views/main-page.php:42
+msgid "Aktivní obchody"
+msgstr ""
+
+#: admin/views/main-page.php:47
+msgid "Aktivní pravidla"
+msgstr ""
+
+#: admin/views/main-page.php:52
+msgid "Mapová služba"
+msgstr ""
+
+#: admin/views/main-page.php:57
+msgid "Jednotka vzdálenosti"
+msgstr ""
+
+#: admin/views/main-page.php:64
+msgid "Rychlé akce"
+msgstr ""
+
+#: admin/views/main-page.php:69
+msgid "Nastavení"
+msgstr ""
+
+#: admin/views/main-page.php:70
+msgid "Konfigurujte mapové služby, jednotky a další základní nastavení."
+msgstr ""
+
+#: admin/views/main-page.php:72
+msgid "Otevřít nastavení"
+msgstr ""
+
+#: admin/views/main-page.php:77
+msgid "Obchody"
+msgstr ""
+
+#: admin/views/main-page.php:78
+msgid "Spravujte lokace vašich obchodů a jejich adresy."
+msgstr ""
+
+#: admin/views/main-page.php:80
+msgid "Spravovat obchody"
+msgstr ""
+
+#: admin/views/main-page.php:85
+msgid "Dopravní pravidla"
+msgstr ""
+
+#: admin/views/main-page.php:86
+msgid "Vytvořte a upravte pravidla pro výpočet dopravních sazeb."
+msgstr ""
+
+#: admin/views/main-page.php:88
+msgid "Spravovat pravidla"
+msgstr ""
+
+#: admin/views/main-page.php:93
+msgid "Test vzdálenosti"
+msgstr ""
+
+#: admin/views/main-page.php:94

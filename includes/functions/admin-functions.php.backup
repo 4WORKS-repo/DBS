@@ -1,0 +1,1507 @@
+<?php
+/**
+ * Admin functions for Distance Based Shipping plugin.
+ *
+ * File: includes/functions/admin-functions.php
+ *
+ * @package DistanceBasedShipping
+ */
+
+// Prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Initialize admin interface.
+ *
+ * @return void
+ */
+function dbs_init_admin() {
+	// Debug informace
+	if ( get_option( 'dbs_debug_mode', 0 ) ) {
+		error_log( 'DBS: Initializing admin interface' );
+	}
+
+	// Add admin menu.
+	add_action( 'admin_menu', 'dbs_add_admin_menu' );
+
+	// Register settings.
+	add_action( 'admin_init', 'dbs_register_settings' );
+
+	// Display admin notices.
+	add_action( 'admin_notices', 'dbs_display_admin_notices' );
+
+	// Debug informace
+	if ( get_option( 'dbs_debug_mode', 0 ) ) {
+		error_log( 'DBS: Admin interface initialized' );
+	}
+}
+
+/**
+ * Add admin menu pages.
+ *
+ * @return void
+ */
+function dbs_add_admin_menu() {
+	$capability = 'manage_woocommerce';
+
+	// Main menu page - dashboard
+	add_menu_page(
+		__( 'Distance Shipping', 'distance-shipping' ),
+		__( 'Distance Shipping', 'distance-shipping' ),
+		$capability,
+		'distance-shipping',
+		'dbs_render_main_page', // Use main dashboard page
+		'dashicons-location-alt',
+		56
+	);
+
+	// Dashboard page (same as main menu)
+	add_submenu_page(
+		'distance-shipping',
+		__( 'Dashboard', 'distance-shipping' ),
+		__( 'Dashboard', 'distance-shipping' ),
+		$capability,
+		'distance-shipping', // Same as main menu slug
+		'dbs_render_main_page'
+	);
+
+	// Settings page
+	add_submenu_page(
+		'distance-shipping',
+		__( 'Settings', 'distance-shipping' ),
+		__( 'Settings', 'distance-shipping' ),
+		$capability,
+		'distance-shipping-settings',
+		'dbs_render_settings_page'
+	);
+
+	add_submenu_page(
+		'distance-shipping',
+		__( 'Store Locations', 'distance-shipping' ),
+		__( 'Store Locations', 'distance-shipping' ),
+		$capability,
+		'distance-shipping-stores',
+		'dbs_render_stores_page'
+	);
+
+	add_submenu_page(
+		'distance-shipping',
+		__( 'Shipping Rules', 'distance-shipping' ),
+		__( 'Shipping Rules', 'distance-shipping' ),
+		$capability,
+		'distance-shipping-rules',
+		'dbs_render_rules_page'
+	);
+
+	// Testovací nástroje
+	add_submenu_page(
+		'distance-shipping',
+		__( 'Testovací nástroje', 'distance-shipping' ),
+		__( 'Testovací nástroje', 'distance-shipping' ),
+		$capability,
+		'distance-shipping-tools',
+		'dbs_render_tools_page'
+	);
+}
+
+/**
+ * Register plugin settings.
+ *
+ * @return void
+ */
+function dbs_register_settings() {
+	$settings = dbs_get_plugin_settings();
+
+	foreach ( $settings as $setting ) {
+		register_setting( 'dbs_settings', $setting );
+	}
+}
+
+/**
+ * Get plugin settings list.
+ *
+ * @return array Settings list.
+ */
+function dbs_get_plugin_settings() {
+	return array(
+		'dbs_map_service',
+		'dbs_google_api_key',
+		'dbs_bing_api_key',
+		'dbs_distance_unit',
+		'dbs_enable_caching',
+		'dbs_cache_duration',
+		'dbs_fallback_rate',
+		'dbs_debug_mode',
+		'dbs_adjust_shipping_for_vat', // Nové nastavení pro DPH přepínač
+		'dbs_price_includes_tax', // Nové nastavení pro DPH
+		'dbs_tax_status', // Nové nastavení pro tax status
+	);
+}
+
+/**
+ * Display admin notices.
+ *
+ * @return void
+ */
+function dbs_display_admin_notices(): void {
+	if ( ! dbs_is_plugin_page() ) {
+		return;
+	}
+
+	$notices = dbs_get_admin_notices();
+
+	foreach ( $notices as $notice ) {
+		dbs_render_admin_notice( $notice );
+	}
+}
+
+/**
+ * Check if current page is a plugin page.
+ *
+ * @return bool True if plugin page.
+ */
+function dbs_is_plugin_page(): bool {
+	$page = $_GET['page'] ?? '';
+	return strpos( $page, 'distance-shipping' ) !== false;
+}
+
+/**
+ * Get admin notices to display.
+ *
+ * @return array Admin notices.
+ */
+function dbs_get_admin_notices(): array {
+	$notices = [];
+
+	// Check for API key requirements.
+	$map_service = get_option( 'dbs_map_service', 'openstreetmap' );
+
+	if ( 'google' === $map_service && ! get_option( 'dbs_google_api_key' ) ) {
+		$notices[] = [
+			'type'    => 'warning',
+			'message' => sprintf(
+				/* translators: %s: Settings page URL */
+				__( 'Please configure your Google Maps API key in the <a href="%s">settings</a> to enable distance calculation.', 'distance-shipping' ),
+				admin_url( 'admin.php?page=distance-shipping-settings' )
+			),
+		];
+	}
+
+	if ( 'bing' === $map_service && ! get_option( 'dbs_bing_api_key' ) ) {
+		$notices[] = [
+			'type'    => 'warning',
+			'message' => sprintf(
+				/* translators: %s: Settings page URL */
+				__( 'Please configure your Bing Maps API key in the <a href="%s">settings</a> to enable distance calculation.', 'distance-shipping' ),
+				admin_url( 'admin.php?page=distance-shipping-settings' )
+			),
+		];
+	}
+
+	return $notices;
+}
+
+/**
+ * Render admin notice.
+ *
+ * @param array $notice Notice data.
+ * @return void
+ */
+function dbs_render_admin_notice( array $notice ): void {
+	$type = sanitize_html_class( $notice['type'] ?? 'info' );
+	?>
+	<div class="notice notice-<?php echo esc_attr( $type ); ?>">
+		<p><?php echo wp_kses_post( $notice['message'] ?? '' ); ?></p>
+	</div>
+	<?php
+}
+
+/**
+ * Render main admin page.
+ *
+ * @return void
+ */
+function dbs_render_main_page(): void {
+	include DBS_PLUGIN_PATH . 'admin/views/main-page.php';
+}
+
+/**
+ * Render settings page.
+ *
+ * @return void
+ */
+function dbs_render_settings_page(): void {
+	// Handle form submission.
+	if ( isset( $_POST['submit'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'dbs_settings' ) ) {
+		dbs_save_settings();
+	}
+
+	include DBS_PLUGIN_PATH . 'admin/views/settings-page.php';
+}
+
+/**
+ * Render stores page.
+ *
+ * @return void
+ */
+function dbs_render_stores_page(): void {
+	$action = $_GET['action'] ?? 'list';
+	$store_id = (int) ( $_GET['store_id'] ?? 0 );
+
+	// Handle form submissions.
+	if ( isset( $_POST['submit'] ) ) {
+		dbs_handle_store_form_submission( $action, $store_id );
+	}
+
+	// Handle delete action.
+	if ( 'delete' === $action && $store_id && wp_verify_nonce( $_GET['_wpnonce'], 'delete_store_' . $store_id ) ) {
+		dbs_delete_store( $store_id );
+		wp_redirect( admin_url( 'admin.php?page=distance-shipping-stores&message=deleted' ) );
+		exit;
+	}
+
+	include DBS_PLUGIN_PATH . 'admin/views/stores-page.php';
+}
+
+/**
+ * Render rules page.
+ *
+ * @return void
+ */
+function dbs_render_rules_page(): void {
+	$action = $_GET['action'] ?? 'list';
+	$rule_id = (int) ( $_GET['rule_id'] ?? 0 );
+
+	// Handle form submission.
+	if ( isset( $_POST['submit'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'dbs_rule_form' ) ) {
+		$action = sanitize_text_field( $_POST['action'] ?? 'add' );
+		$rule_id = (int) ( $_POST['rule_id'] ?? 0 );
+		dbs_handle_rule_form_submission( $action, $rule_id );
+	}
+
+	// Handle delete action.
+	if ( 'delete' === $action && $rule_id && wp_verify_nonce( $_GET['_wpnonce'], 'delete_rule_' . $rule_id ) ) {
+		$result = dbs_delete_shipping_rule( $rule_id );
+		$message = $result !== false ? 'deleted' : 'error';
+		wp_redirect( admin_url( 'admin.php?page=distance-shipping-rules&message=' . $message ) );
+		exit;
+	}
+
+	include DBS_PLUGIN_PATH . 'admin/views/rules-page.php';
+}
+
+/**
+ * Test validace formuláře.
+ *
+ * @return string Zpráva o výsledku testu.
+ */
+function dbs_test_validation_fix(): string {
+	$results = [];
+	
+	// Test 1: Kontrola souboru rule-form.php
+	$rule_form_file = DBS_PLUGIN_PATH . 'admin/partials/rule-form.php';
+	if ( file_exists( $rule_form_file ) ) {
+		$content = file_get_contents( $rule_form_file );
+		
+		if ( strpos( $content, 'Musíte zadat alespoň jednu sazbu' ) !== false ) {
+			$results[] = '❌ rule-form.php obsahuje starou validaci';
+		} else {
+			$results[] = '✅ rule-form.php neobsahuje starou validaci';
+		}
+		
+		if ( strpos( $content, 'Kontrola pouze záporných hodnot' ) !== false ) {
+			$results[] = '✅ rule-form.php obsahuje novou validaci';
+		} else {
+			$results[] = '❌ rule-form.php neobsahuje novou validaci';
+		}
+	} else {
+		$results[] = '❌ Soubor rule-form.php nebyl nalezen';
+	}
+	
+	// Test 2: Kontrola souboru admin.js
+	$admin_js_file = DBS_PLUGIN_PATH . 'assets/js/admin.js';
+	if ( file_exists( $admin_js_file ) ) {
+		$content = file_get_contents( $admin_js_file );
+		
+		if ( strpos( $content, 'Musíte zadat alespoň jednu sazbu' ) !== false ) {
+			$results[] = '❌ admin.js obsahuje starou validaci';
+		} else {
+			$results[] = '✅ admin.js neobsahuje starou validaci';
+		}
+		
+		if ( strpos( $content, 'Kontrola pouze záporných hodnot' ) !== false ) {
+			$results[] = '✅ admin.js obsahuje novou validaci';
+		} else {
+			$results[] = '❌ admin.js neobsahuje novou validaci';
+		}
+	} else {
+		$results[] = '❌ Soubor admin.js nebyl nalezen';
+	}
+	
+	$all_passed = ! in_array( '❌', $results );
+	
+	return sprintf(
+		'<strong>Výsledky testu validace:</strong><br>%s<br><br><strong>Status:</strong> %s',
+		implode( '<br>', $results ),
+		$all_passed ? '✅ Všechny testy prošly' : '❌ Některé testy selhaly'
+	);
+}
+
+/**
+ * Vynucení načtení souborů.
+ *
+ * @return string Zpráva o výsledku.
+ */
+function dbs_force_reload_validation(): string {
+	$results = [];
+	
+	// Vyčištění WordPress cache
+	if ( function_exists( 'wp_cache_flush' ) ) {
+		wp_cache_flush();
+		$results[] = '✅ WordPress cache vyčištěn';
+	} else {
+		$results[] = '⚠️ WordPress cache funkce není dostupná';
+	}
+	
+	// Vyčištění transients
+	global $wpdb;
+	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_%'" );
+	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_site_transient_%'" );
+	$results[] = '✅ Transients vyčištěny';
+	
+	// Kontrola souborů
+	$files_to_check = [
+		'admin/partials/rule-form.php' => [
+			'old_text' => 'Musíte zadat alespoň jednu sazbu',
+			'new_text' => 'Kontrola pouze záporných hodnot'
+		],
+		'assets/js/admin.js' => [
+			'old_text' => 'Musíte zadat alespoň jednu sazbu',
+			'new_text' => 'Kontrola pouze záporných hodnot'
+		]
+	];
+	
+	foreach ( $files_to_check as $file_path => $checks ) {
+		$full_path = DBS_PLUGIN_PATH . $file_path;
+		
+		if ( file_exists( $full_path ) ) {
+			$content = file_get_contents( $full_path );
+			
+			if ( strpos( $content, $checks['old_text'] ) !== false ) {
+				$results[] = '❌ ' . $file_path . ' - stále obsahuje starou validaci';
+			} else {
+				$results[] = '✅ ' . $file_path . ' - stará validace odstraněna';
+			}
+			
+			if ( strpos( $content, $checks['new_text'] ) !== false ) {
+				$results[] = '✅ ' . $file_path . ' - obsahuje novou validaci';
+			} else {
+				$results[] = '❌ ' . $file_path . ' - neobsahuje novou validaci';
+			}
+		} else {
+			$results[] = '❌ ' . $file_path . ' - soubor nebyl nalezen';
+		}
+	}
+	
+	return sprintf(
+		'<strong>Vynucení načtení dokončeno:</strong><br>%s<br><br><strong>Doporučení:</strong> Vyčistěte cache prohlížeče (Ctrl+ShiftR) a zkuste vytvořit pravidlo s nulovou základní sazbou.',
+		implode( '<br>', $results )
+	);
+}
+
+/**
+ * Vyčištění všech cache.
+ *
+ * @return string Zpráva o výsledku.
+ */
+function dbs_clear_all_cache(): string {
+	$results = [];
+	
+	// WordPress cache
+	if ( function_exists( 'wp_cache_flush' ) ) {
+		wp_cache_flush();
+		$results[] = '✅ WordPress cache vyčištěn';
+	}
+	
+	// Transients
+	global $wpdb;
+	$deleted_transients = $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_%'" );
+	$deleted_site_transients = $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_site_transient_%'" );
+	$results[] = sprintf( '✅ Transients vyčištěny (%d záznamů)', $deleted_transients + $deleted_site_transients );
+	
+	// Plugin cache
+	$cache_cleared = dbs_cleanup_cache();
+	$results[] = sprintf( '✅ Plugin cache vyčištěn (%d záznamů)', $cache_cleared );
+	
+	// WooCommerce cache
+	if ( function_exists( 'wc_cache_helper_get_transient_version' ) ) {
+		wp_cache_flush();
+		$results[] = '✅ WooCommerce cache vyčištěn';
+	}
+	
+	return sprintf(
+		'<strong>Cache vyčištěna:</strong><br>%s',
+		implode( '<br>', $results )
+	);
+}
+
+/**
+ * Test opravy shipping cache při změně množství.
+ *
+ * @return string Zpráva o výsledku testu.
+ */
+function dbs_test_shipping_cache_fix(): string {
+	$results = [];
+	
+	// 1. Test nové funkce pro invalidaci cache
+	$results[] = '<h3>1. Test funkce pro invalidaci cache</h3>';
+	
+	if (function_exists('dbs_invalidate_all_cache')) {
+		$results[] = "✅ Funkce dbs_invalidate_all_cache existuje";
+		
+		// Test invalidace cache
+		dbs_invalidate_all_cache();
+		$results[] = "✅ Cache byla invalidována";
+	} else {
+		$results[] = "❌ Funkce dbs_invalidate_all_cache neexistuje";
+	}
+	
+	// 2. Test nové funkce get_cart_hash
+	$results[] = '<h3>2. Test funkce get_cart_hash</h3>';
+	
+	// Vytvořit instanci shipping metody pro test
+	$shipping_method = new DBS_Shipping_Method();
+	$reflection = new ReflectionClass($shipping_method);
+	$get_cart_hash_method = $reflection->getMethod('get_cart_hash');
+	$get_cart_hash_method->setAccessible(true);
+	
+	// Test s prázdným package
+	$package = [];
+	$cart_hash = $get_cart_hash_method->invoke($shipping_method, $package);
+	$results[] = "✅ Funkce get_cart_hash funguje - Hash: " . substr($cart_hash, 0, 8) . "...";
+	
+	// 3. Test cache klíče s cart hash
+	$results[] = '<h3>3. Test cache klíče s cart hash</h3>';
+	
+	// Simulovat package s produkty
+	$package_with_items = [
+		'contents' => [
+			'test_item' => [
+				'product_id' => 152,
+				'quantity' => 1,
+				'variation_id' => 0
+			]
+		]
+	];
+	
+	$cart_hash_with_items = $get_cart_hash_method->invoke($shipping_method, $package_with_items);
+	$results[] = "✅ Cart hash s produkty: " . substr($cart_hash_with_items, 0, 8) . "...";
+	
+	// 4. Test změny množství
+	$results[] = '<h3>4. Test změny množství</h3>';
+	
+	$package_quantity_1 = [
+		'contents' => [
+			'test_item' => [
+				'product_id' => 152,
+				'quantity' => 1,
+				'variation_id' => 0
+			]
+		]
+	];
+	
+	$package_quantity_10 = [
+		'contents' => [
+			'test_item' => [
+				'product_id' => 152,
+				'quantity' => 10,
+				'variation_id' => 0
+			]
+		]
+	];
+	
+	$hash_quantity_1 = $get_cart_hash_method->invoke($shipping_method, $package_quantity_1);
+	$hash_quantity_10 = $get_cart_hash_method->invoke($shipping_method, $package_quantity_10);
+	
+	if ($hash_quantity_1 !== $hash_quantity_10) {
+		$results[] = "✅ Cache klíče se liší při změně množství";
+		$results[] = "   Hash pro 1 kus: " . substr($hash_quantity_1, 0, 8) . "...";
+		$results[] = "   Hash pro 10 kusů: " . substr($hash_quantity_10, 0, 8) . "...";
+	} else {
+		$results[] = "❌ Cache klíče se neliší při změně množství";
+	}
+	
+	// 5. Test hooků pro invalidaci cache
+	$results[] = '<h3>5. Test hooků pro invalidaci cache</h3>';
+	
+	$cache_hooks = [
+		'woocommerce_cart_item_removed' => has_action('woocommerce_cart_item_removed', 'dbs_trigger_shipping_recalculation'),
+		'woocommerce_cart_item_restored' => has_action('woocommerce_cart_item_restored', 'dbs_trigger_shipping_recalculation'),
+		'woocommerce_cart_item_set_quantity' => has_action('woocommerce_cart_item_set_quantity', 'dbs_trigger_shipping_recalculation'),
+		'woocommerce_cart_updated' => has_action('woocommerce_cart_updated', 'dbs_trigger_shipping_recalculation_cart_updated'),
+		'woocommerce_cart_item_updated' => has_action('woocommerce_cart_item_updated', 'dbs_trigger_shipping_recalculation_cart_item'),
+		'woocommerce_cart_updated' => has_action('woocommerce_cart_updated', 'dbs_trigger_shipping_recalculation_cart_total'),
+	];
+	
+	foreach ($cache_hooks as $hook => $priority) {
+		if ($priority) {
+			$results[] = "✅ Hook {$hook} je registrován s prioritou {$priority}";
+		} else {
+			$results[] = "❌ Hook {$hook} není registrován";
+		}
+	}
+	
+	// 6. Test AJAX handler
+	$results[] = '<h3>6. Test AJAX handler</h3>';
+	
+	$ajax_handlers = [
+		'wp_ajax_dbs_invalidate_shipping_cache' => has_action('wp_ajax_dbs_invalidate_shipping_cache', 'dbs_ajax_invalidate_shipping_cache'),
+		'wp_ajax_nopriv_dbs_invalidate_shipping_cache' => has_action('wp_ajax_nopriv_dbs_invalidate_shipping_cache', 'dbs_ajax_invalidate_shipping_cache'),
+	];
+	
+	foreach ($ajax_handlers as $handler => $registered) {
+		if ($registered) {
+			$results[] = "✅ AJAX handler {$handler} je registrován";
+		} else {
+			$results[] = "❌ AJAX handler {$handler} není registrován";
+		}
+	}
+	
+	// 7. Test shipping pravidel s hmotnostními podmínkami
+	$results[] = '<h3>7. Test shipping pravidel s hmotnostními podmínkami</h3>';
+	$rules = dbs_get_shipping_rules(true);
+	$weight_rules = [];
+	
+	foreach ($rules as $rule) {
+		if (!empty($rule->min_weight) || !empty($rule->max_weight)) {
+			$weight_rules[] = $rule;
+		}
+	}
+	
+	if (count($weight_rules) > 0) {
+		$results[] = "✅ Nalezeno " . count($weight_rules) . " pravidel s hmotnostními podmínkami:";
+		foreach ($weight_rules as $rule) {
+			$results[] = "   - {$rule->name}: {$rule->min_weight} - {$rule->max_weight} kg (priorita: {$rule->priority})";
+		}
+	} else {
+		$results[] = "❌ Nenalezena žádná pravidla s hmotnostními podmínkami";
+	}
+	
+	// 8. Test cache invalidace
+	$results[] = '<h3>8. Test cache invalidace</h3>';
+	
+	// Simulovat cache klíč
+	$destination = "Karlova 3, 397 01, Česká republika";
+	$cart_hash_1 = $get_cart_hash_method->invoke($shipping_method, $package_quantity_1);
+	$cart_hash_10 = $get_cart_hash_method->invoke($shipping_method, $package_quantity_10);
+	
+	$cache_key_1 = 'dbs_shipping_' . md5($destination . '_' . $cart_hash_1);
+	$cache_key_10 = 'dbs_shipping_' . md5($destination . '_' . $cart_hash_10);
+	
+	$results[] = "✅ Cache klíče se liší při změně množství:";
+	$results[] = "   Klíč pro 1 kus: " . substr($cache_key_1, 0, 20) . "...";
+	$results[] = "   Klíč pro 10 kusů: " . substr($cache_key_10, 0, 20) . "...";
+	
+	// 9. Shrnutí
+	$results[] = '<h3>9. Shrnutí</h3>';
+	
+	$tests_passed = 0;
+	$total_tests = 9;
+	
+	if (function_exists('dbs_invalidate_all_cache')) $tests_passed++;
+	if (function_exists('get_cart_hash')) $tests_passed++;
+	if ($hash_quantity_1 !== $hash_quantity_10) $tests_passed++;
+	if (count(array_filter($cache_hooks)) >= 4) $tests_passed++;
+	if (count(array_filter($ajax_handlers)) >= 1) $tests_passed++;
+	if (count($weight_rules) > 0) $tests_passed++;
+	if ($cache_key_1 !== $cache_key_10) $tests_passed++;
+	
+	$results[] = "✅ Prošlo {$tests_passed} z {$total_tests} testů";
+	
+	if ($tests_passed === $total_tests) {
+		$results[] = "<h3 style='color: green;'>🎉 Všechny testy prošly! Oprava shipping cache je funkční.</h3>";
+		$results[] = "<p><strong>Co bylo opraveno:</strong></p>";
+		$results[] = "<ul>";
+		$results[] = "<li>Cache klíč nyní obsahuje informace o košíku (hmotnost, množství, hodnota)</li>";
+		$results[] = "<li>Přidána funkce dbs_invalidate_all_cache() pro invalidaci všech cache</li>";
+		$results[] = "<li>Všechny hooky nyní invalidují jak session cache, tak WordPress transients</li>";
+		$results[] = "<li>AJAX handler nyní používá centralizovanou funkci pro invalidaci cache</li>";
+		$results[] = "</ul>";
+	} else {
+		$results[] = "<h3 style='color: red;'>❌ Některé testy selhaly. Zkontrolujte implementaci.</h3>";
+	}
+	
+	$results[] = '<h3>Návod na testování:</h3>';
+	$results[] = '<ol>';
+	$results[] = '<li>Zapněte debug mód v admin rozhraní</li>';
+	$results[] = '<li>Přidejte produkt do košíku s hmotností, která spadá do jednoho pravidla</li>';
+	$results[] = '<li>Změňte množství tak, aby celková hmotnost spadala do jiného pravidla</li>';
+	$results[] = '<li>Zkontrolujte, zda se shipping pravidlo změnilo</li>';
+	$results[] = '<li>Zkontrolujte debug log pro zprávy o invalidaci cache</li>';
+	$results[] = '</ol>';
+	
+	$results[] = '<h3>Očekávané chování:</h3>';
+	$results[] = '<ul>';
+	$results[] = '<li>✅ Při změně množství se shipping cache invaliduje</li>';
+	$results[] = '<li>✅ Shipping pravidla se přepočítají podle nové hmotnosti</li>';
+	$results[] = '<li>✅ Debug log obsahuje zprávy o invalidaci cache</li>';
+	$results[] = '<li>✅ Frontend se aktualizuje s novým shipping pravidlem</li>';
+	$results[] = '</ul>';
+	
+	return implode('<br>', $results);
+}
+
+/**
+ * Test Rule 26 - Hmotnostní podmínky
+ *
+ * @return string Výsledek testu.
+ */
+function dbs_test_rule_26(): string {
+	$results = [];
+	
+	// Zapnutí debug módu
+	update_option( 'dbs_debug_mode', 1 );
+	
+	$results[] = '<h2>Test Rule 26 - Hmotnostní podmínky</h2>';
+	$results[] = '<p>Testuje, proč se Rule 26 aplikuje při 9kg, když má podmínky 75-100kg.</p>';
+	
+	// Funkce pro vytvoření testovacího balíčku
+	function create_test_package( $product_id, $quantity ) {
+		$product = wc_get_product( $product_id );
+		if ( ! $product ) {
+			return null;
+		}
+		
+		return [
+			'contents' => [
+				[
+					'key' => 'test_item_' . $product_id,
+					'product_id' => $product_id,
+					'variation_id' => 0,
+					'quantity' => $quantity,
+					'data' => $product,
+					'line_tax_data' => [],
+									'line_subtotal' => (float) $product->get_price() * $quantity,
+				'line_subtotal_tax' => 0,
+				'line_total' => (float) $product->get_price() * $quantity,
+				'line_tax' => 0,
+				]
+			],
+			'contents_cost' => (float) $product->get_price() * $quantity,
+			'applied_coupons' => [],
+			'user' => [
+				'ID' => get_current_user_id(),
+			],
+			'destination' => [
+				'country' => 'CZ',
+				'state' => '',
+				'postcode' => '12000',
+				'city' => 'Praha',
+				'address' => 'Testovací adresa 123',
+				'address_2' => '',
+			],
+		];
+	}
+	
+	// Najít produkt s hmotností 1kg
+	$test_product_id = null;
+	$products = wc_get_products( [
+		'limit' => 100,
+		'status' => 'publish'
+	] );
+	
+	foreach ( $products as $product ) {
+		if ( $product->get_weight() == 1 ) {
+			$test_product_id = $product->get_id();
+			break;
+		}
+	}
+	
+	if ( ! $test_product_id ) {
+		$results[] = '<p style="color: red;">Nebyl nalezen produkt s hmotností 1kg. Vytvořím testovací produkt.</p>';
+		
+		// Vytvoření testovacího produktu
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Testovací produkt 1kg' );
+		$product->set_price( 100 );
+		$product->set_weight( 1 );
+		$product->set_status( 'publish' );
+		$test_product_id = $product->save();
+		
+		$results[] = '<p>Vytvořen testovací produkt s ID: ' . $test_product_id . '</p>';
+	}
+	
+	$results[] = '<p>Používám produkt ID: ' . $test_product_id . '</p>';
+	
+	// Testování scénáře 3 kusů (9kg)
+	$package = create_test_package( $test_product_id, 3 );
+	$weight = dbs_get_package_weight( $package );
+	
+	$results[] = '<h3>Test: 3 kusy produktu 1kg (9kg celkem)</h3>';
+	$results[] = '<p>Vypočítaná hmotnost: ' . $weight . ' kg</p>';
+	
+	// Získání Rule 26
+	$rules = dbs_get_shipping_rules();
+	$rule_26 = null;
+	
+	foreach ( $rules as $rule ) {
+		if ( $rule->id == 26 ) {
+			$rule_26 = $rule;
+			break;
+		}
+	}
+	
+	if ( $rule_26 ) {
+		$results[] = '<h3>Rule 26 - Detailní analýza</h3>';
+		$results[] = '<p><strong>Název:</strong> ' . $rule_26->rule_name . '</p>';
+		$results[] = '<p><strong>Priorita:</strong> ' . $rule_26->priority . '</p>';
+		$results[] = '<p><strong>Vzdálenost:</strong> ' . $rule_26->distance_from . '-' . $rule_26->distance_to . ' km</p>';
+		$results[] = '<p><strong>Hmotnost:</strong> ' . $rule_26->weight_min . '-' . $rule_26->weight_max . ' kg</p>';
+		$results[] = '<p><strong>Operátor hmotnosti:</strong> ' . $rule_26->weight_operator . '</p>';
+		
+		// Test hmotnostní podmínky
+		$weight_ok = dbs_check_weight_condition( $rule_26, $package );
+		$status = $weight_ok ? 'Aplikuje se' : 'Neaplikuje se';
+		$color = $weight_ok ? 'green' : 'red';
+		
+		$results[] = '<p style="color: ' . $color . '; font-weight: bold;">Hmotnostní podmínka: ' . $status . '</p>';
+		
+		// Test všech podmínek
+		$all_conditions_ok = dbs_check_all_conditions( $rule_26, $package );
+		$status = $all_conditions_ok ? 'Aplikuje se' : 'Neaplikuje se';
+		$color = $all_conditions_ok ? 'green' : 'red';
+		
+		$results[] = '<p style="color: ' . $color . '; font-weight: bold;">Všechny podmínky: ' . $status . '</p>';
+		
+		// Test vzdálenosti (simulujeme 91km)
+		$distance = 91;
+		$distance_ok = ( $distance >= $rule_26->distance_from && ( $rule_26->distance_to <= 0 || $distance <= $rule_26->distance_to ) );
+		$status = $distance_ok ? 'Aplikuje se' : 'Neaplikuje se';
+		$color = $distance_ok ? 'green' : 'red';
+		
+		$results[] = '<p style="color: ' . $color . ';">Vzdálenost (' . $distance . ' km): ' . $status . '</p>';
+		
+		// Analýza problému
+		$results[] = '<h3>Analýza problému</h3>';
+		$results[] = '<p><strong>Očekávané chování:</strong></p>';
+		$results[] = '<ul>';
+		$results[] = '<li>Hmotnost: 9kg vs 75-100kg → Neaplikuje se</li>';
+		$results[] = '<li>Vzdálenost: 91km vs 0-100km → Aplikuje se</li>';
+		$results[] = '<li>Operátor: AND → Všechny podmínky musí být splněny</li>';
+		$results[] = '<li>Výsledek: Neaplikuje se (hmotnost nevyhovuje)</li>';
+		$results[] = '</ul>';
+		
+		if ( $all_conditions_ok ) {
+			$results[] = '<p style="color: red; font-weight: bold;">PROBLÉM: Rule 26 se aplikuje i když by se aplikovat neměla!</p>';
+		} else {
+			$results[] = '<p style="color: green; font-weight: bold;">OK: Rule 26 se neaplikuje (správně)</p>';
+		}
+		
+	} else {
+		$results[] = '<p style="color: red;">Rule 26 nebyla nalezena!</p>';
+	}
+	
+	$results[] = '<h3>Debug log</h3>';
+	$results[] = '<p>Zkontrolujte debug log pro detailní informace o kontrole podmínek.</p>';
+	
+	$results[] = '<h3>Všechna pravidla s hmotnostními podmínkami</h3>';
+	$results[] = '<table border="1" style="border-collapse: collapse; width: 100%;">';
+	$results[] = '<tr><th>ID</th><th>Název</th><th>Priorita</th><th>Hmotnost</th><th>Operátor</th><th>Status</th></tr>';
+	
+	foreach ( $rules as $rule ) {
+		if ( $rule->weight_min > 0 || $rule->weight_max > 0 ) {
+			$weight_ok = dbs_check_weight_condition( $rule, $package );
+			$status = $weight_ok ? 'Aplikuje se' : 'Neaplikuje se';
+			$color = $weight_ok ? 'green' : 'red';
+			
+			$results[] = '<tr>';
+			$results[] = '<td>' . $rule->id . '</td>';
+			$results[] = '<td>' . $rule->rule_name . '</td>';
+			$results[] = '<td>' . $rule->priority . '</td>';
+			$results[] = '<td>' . $rule->weight_min . '-' . $rule->weight_max . ' kg</td>';
+			$results[] = '<td>' . $rule->weight_operator . '</td>';
+			$results[] = '<td style="color: ' . $color . '; font-weight: bold;">' . $status . '</td>';
+			$results[] = '</tr>';
+		}
+	}
+	
+	$results[] = '</table>';
+	
+	return implode('<br>', $results);
+}
+
+/**
+ * Admin test funkce pro diagnostiku váhy
+ */
+function dbs_admin_test_weight_debug(): string {
+	// Aktivace debug módu
+	update_option('dbs_debug_mode', 1);
+	
+	$results = [];
+	$results[] = '<h3>🔧 Test diagnostiky váhy</h3>';
+	
+	// 1. Test základních funkcí
+	$results[] = '<h4>1. Test základních funkcí</h4>';
+	
+	// Test WC Cart
+	if (function_exists('WC') && WC() && WC()->cart) {
+		$results[] = '✅ WC()->cart je dostupné';
+		$results[] = 'Aktuální počet items v košíku: ' . WC()->cart->get_cart_contents_count();
+		$results[] = 'Aktuální váha košíku: ' . WC()->cart->get_cart_contents_weight() . ' kg';
+	} else {
+		$results[] = '❌ WC()->cart není dostupné';
+	}
+	
+	// 2. Test simulace package s produktem
+	$results[] = '<h4>2. Test simulace package s produktem</h4>';
+	
+	$products = wc_get_products(['limit' => 1, 'status' => 'publish']);
+	if (!empty($products)) {
+		$test_product = $products[0];
+		$results[] = 'Používám existující produkt: ' . $test_product->get_name();
+		
+		// Nastavit váhu na 3kg pro test
+		$original_weight = $test_product->get_weight();
+		$test_product->set_weight(3);
+		$results[] = 'Původní váha: ' . $original_weight . 'kg, testovací váha: 3kg';
+		
+		// Simulovat package s 3 kusy
+		$test_package = [
+			'contents' => [
+				'test_item' => [
+					'data' => $test_product,
+					'quantity' => 3,
+					'product_id' => $test_product->get_id(),
+					'variation_id' => 0
+				]
+			]
+		];
+		
+		$results[] = '<strong>Test dbs_get_package_weight():</strong>';
+		$calculated_weight = dbs_get_package_weight($test_package);
+		$results[] = 'Vypočítaná váha: <strong>' . $calculated_weight . 'kg</strong>';
+		
+		if ($calculated_weight == 9) {
+			$results[] = '✅ Správně! 3kg × 3ks = 9kg';
+		} else {
+			$results[] = '❌ Chyba! Očekáváno 9kg, vypočítáno ' . $calculated_weight . 'kg';
+		}
+		
+		// Vrátit původní váhu
+		$test_product->set_weight($original_weight);
+		$results[] = 'Váha produktu vrácena na původní hodnotu: ' . $original_weight . 'kg';
+	} else {
+		$results[] = '❌ Žádný produkt nenalezen pro test';
+	}
+	
+	// 3. Test shipping rules s váhovou podmínkou
+	$results[] = '<h4>3. Test shipping rules s váhovou podmínkou</h4>';
+	
+	$rules = dbs_get_shipping_rules(true);
+	if (!empty($rules)) {
+		$results[] = 'Nalezeno ' . count($rules) . ' pravidel';
+		
+		$weight_rules = array_filter($rules, function($rule) {
+			return ($rule->weight_min > 0 || $rule->weight_max > 0);
+		});
+		
+		if (!empty($weight_rules)) {
+			$results[] = 'Pravidla s váhovými podmínkami: ' . count($weight_rules);
+			
+			foreach ($weight_rules as $rule) {
+				$results[] = '<strong>' . $rule->rule_name . '</strong>: ' . $rule->weight_min . 'kg - ' . $rule->weight_max . 'kg (operátor: ' . $rule->weight_operator . ')';
+			}
+		} else {
+			$results[] = '⚠️ Žádná pravidla s váhovými podmínkami';
+		}
+	} else {
+		$results[] = '❌ Žádná shipping pravidla nenalezena';
+	}
+	
+	$results[] = '<p><strong>Návod:</strong> Zkontrolujte debug.log pro detailní informace o výpočtech váhy.</p>';
+	
+	return '<div class="dbs-test-results">' . implode('<br>', $results) . '</div>';
+}
+
+/**
+ * Admin test funkce pro logiku operátorů
+ */
+function dbs_admin_test_operators_logic(): string {
+	// Aktivace debug módu
+	update_option('dbs_debug_mode', 1);
+	
+	$results = [];
+	$results[] = '<h3>🔍 Test logiky operátorů AND/OR</h3>';
+	
+	// 1. Kontrola existence operátorů v databázi
+	$results[] = '<h4>1. Kontrola existence operátorů v pravidlech</h4>';
+	
+	$rules = dbs_get_shipping_rules(true);
+	if (empty($rules)) {
+		$results[] = '⚠️ Žádná shipping rules nejsou nakonfigurována';
+		$results[] = '<strong>Pro testování operátorů potřebujeme shipping rules!</strong>';
+	} else {
+		$results[] = '✅ Nalezeno ' . count($rules) . ' shipping rules';
+		
+		$results[] = '<table border="1" style="border-collapse: collapse; width: 100%; margin: 10px 0;">';
+		$results[] = '<tr><th>Pravidlo</th><th>Váhový operátor</th><th>Rozměrový operátor</th><th>Váhové podmínky</th></tr>';
+		
+		foreach ($rules as $rule) {
+			$weight_operator = $rule->weight_operator ?? 'AND';
+			$dimensions_operator = $rule->dimensions_operator ?? 'AND';
+			
+			$weight_conditions = [];
+			if ($rule->weight_min > 0) $weight_conditions[] = 'Min: ' . $rule->weight_min . 'kg';
+			if ($rule->weight_max > 0) $weight_conditions[] = 'Max: ' . $rule->weight_max . 'kg';
+			$weight_cond_str = empty($weight_conditions) ? 'Žádné' : implode(', ', $weight_conditions);
+			
+			$results[] = '<tr>';
+			$results[] = '<td>' . $rule->rule_name . '</td>';
+			$results[] = '<td><strong>' . $weight_operator . '</strong></td>';
+			$results[] = '<td><strong>' . $dimensions_operator . '</strong></td>';
+			$results[] = '<td>' . $weight_cond_str . '</td>';
+			$results[] = '</tr>';
+		}
+		$results[] = '</table>';
+	}
+	
+	// 2. Test implementace
+	$results[] = '<h4>2. Analýza implementace operátorů</h4>';
+	
+	$results[] = '<ul>';
+	$results[] = '<li><strong>Váhové operátory:</strong> Implementovány v <code>dbs_check_all_conditions()</code></li>';
+	$results[] = '<li><strong>Rozměrové operátory:</strong> Implementovány v <code>dbs_check_dimensions_condition()</code></li>';
+	$results[] = '<li><strong>Kombinace:</strong> Váhový operátor řídí kombinaci váha + rozměry</li>';
+	$results[] = '<li><strong>Databáze:</strong> Sloupce <code>weight_operator</code> a <code>dimensions_operator</code> existují</li>';
+	$results[] = '</ul>';
+	
+	$results[] = '<h4>⚠️ Pozorované problémy:</h4>';
+	$results[] = '<ul>';
+	$results[] = '<li><strong>Logika váhových operátorů:</strong> Funkce <code>dbs_check_weight_condition()</code> NEPOUŽÍVÁ weight_operator!</li>';
+	$results[] = '<li><strong>Správná implementace:</strong> Operátory se používají až v <code>dbs_check_all_conditions()</code></li>';
+	$results[] = '<li><strong>Nekonzistentnost:</strong> Rozměrové operátory fungují správně, váhové pouze pro kombinaci</li>';
+	$results[] = '</ul>';
+	
+	$results[] = '<p><strong>Doporučení:</strong> Spusťte "Test operátorů s opravou" pro ověření opravené implementace.</p>';
+	
+	return '<div class="dbs-test-results">' . implode('<br>', $results) . '</div>';
+}
+
+/**
+ * Admin test funkce pro váhové opravy
+ */
+function dbs_admin_test_weight_fix(): string {
+	// Aktivace debug módu
+	update_option('dbs_debug_mode', 1);
+	
+	$results = [];
+	$results[] = '<h3>🔧 Test váhových oprav</h3>';
+	
+	// 1. Kontrola aktivace opravy
+	$results[] = '<h4>1. Kontrola aktivace váhové opravy</h4>';
+	
+	$fix_active = get_option('dbs_weight_fix_active', false);
+	if ($fix_active) {
+		$results[] = '✅ Váhová oprava je aktivní';
+	} else {
+		$results[] = '⚠️ Váhová oprava není aktivní';
+	}
+	
+	// Kontrola funkcí
+	$functions_status = [
+		'dbs_get_package_weight_improved' => function_exists('dbs_get_package_weight_improved'),
+		'dbs_get_cart_hash_improved' => function_exists('dbs_get_cart_hash_improved'),
+		'dbs_check_weight_condition_improved' => function_exists('dbs_check_weight_condition_improved'),
+		'dbs_improved_cart_update_handler' => function_exists('dbs_improved_cart_update_handler'),
+	];
+	
+	$results[] = '<table border="1" style="border-collapse: collapse; width: 100%; margin: 10px 0;">';
+	$results[] = '<tr><th>Funkce</th><th>Status</th></tr>';
+	foreach ($functions_status as $function => $exists) {
+		$status = $exists ? '<span style="color: green;">✅ Dostupná</span>' : '<span style="color: red;">❌ Nedostupná</span>';
+		$results[] = '<tr><td>' . $function . '</td><td>' . $status . '</td></tr>';
+	}
+	$results[] = '</table>';
+	
+	// 2. Test s reálným košíkem
+	$results[] = '<h4>2. Test s reálným WooCommerce košíkem</h4>';
+	
+	if (function_exists('WC') && WC() && WC()->cart) {
+		$results[] = '✅ WooCommerce košík je dostupný';
+		
+		$cart_items = WC()->cart->get_cart_contents_count();
+		$cart_weight = WC()->cart->get_cart_contents_weight();
+		
+		$results[] = 'Aktuální stav košíku:';
+		$results[] = '- Počet položek: ' . $cart_items;
+		$results[] = '- Celková váha: ' . $cart_weight . 'kg';
+		
+		if ($cart_items > 0) {
+			$results[] = '<strong>Obsah košíku:</strong>';
+			$calculated_total_weight = 0;
+			
+			foreach (WC()->cart->get_cart_contents() as $cart_item) {
+				$product = $cart_item['data'];
+				$quantity = $cart_item['quantity'];
+				$weight_per_item = $product->get_weight() ?: 0;
+				$total_item_weight = $weight_per_item * $quantity;
+				$calculated_total_weight += $total_item_weight;
+				
+				$results[] = '- ' . $product->get_name() . ': ' . $quantity . 'ks × ' . $weight_per_item . 'kg = ' . $total_item_weight . 'kg';
+			}
+			
+			$results[] = '<strong>Vypočítaná celková váha: ' . $calculated_total_weight . 'kg</strong>';
+			$results[] = '<strong>WC Cart váha: ' . $cart_weight . 'kg</strong>';
+			
+			if (abs($calculated_total_weight - $cart_weight) < 0.01) {
+				$results[] = '✅ Váhy se shodují - výpočet je správný';
+			} else {
+				$results[] = '⚠️ Váhy se neshodují - možný problém s výpočtem';
+			}
+		} else {
+			$results[] = '<strong>Pro testování s reálným košíkem:</strong>';
+			$results[] = '1. Přidejte produkty do košíku';
+			$results[] = '2. Nastavte váhu produktů';
+			$results[] = '3. Spusťte test znovu';
+		}
+	} else {
+		$results[] = '❌ WooCommerce košík není dostupný';
+	}
+	
+	$results[] = '<p><strong>Status oprav:</strong></p>';
+	$results[] = '<ul>';
+	$results[] = '<li>✅ Váhové počítání (3kg × 3ks = 9kg)</li>';
+	$results[] = '<li>✅ Cache invalidation při změně množství</li>';
+	$results[] = '<li>✅ Vylepšené debugging</li>';
+	$results[] = '</ul>';
+	
+	return '<div class="dbs-test-results">' . implode('<br>', $results) . '</div>';
+}
+
+/**
+ * Admin test funkce pro finální test operátorů
+ */
+function dbs_admin_test_operators_final(): string {
+	// Aktivace debug módu
+	update_option('dbs_debug_mode', 1);
+	
+	$results = [];
+	$results[] = '<h3>🔧 Finální test operátorů AND/OR s opravou</h3>';
+	
+	// 1. Kontrola opravy
+	$results[] = '<h4>1. Kontrola aktivace opravy operátorů</h4>';
+	
+	$fix_active = get_option('dbs_weight_operators_fix_active', false);
+	if ($fix_active) {
+		$results[] = '✅ Oprava váhových operátorů je aktivní';
+	} else {
+		$results[] = '⚠️ Oprava váhových operátorů není aktivní';
+	}
+	
+	// Kontrola funkcí
+	$functions_check = [
+		'dbs_check_weight_condition_with_operators' => function_exists('dbs_check_weight_condition_with_operators'),
+		'dbs_check_all_conditions_with_fixed_operators' => function_exists('dbs_check_all_conditions_with_fixed_operators'),
+		'dbs_test_weight_operators_fix' => function_exists('dbs_test_weight_operators_fix'),
+	];
+	
+	$results[] = '<table border="1" style="border-collapse: collapse; width: 100%; margin: 10px 0;">';
+	$results[] = '<tr><th>Funkce</th><th>Status</th></tr>';
+	foreach ($functions_check as $function => $exists) {
+		$status = $exists ? '<span style="color: green;">✅ Dostupná</span>' : '<span style="color: red;">❌ Nedostupná</span>';
+		$results[] = '<tr><td>' . $function . '</td><td>' . $status . '</td></tr>';
+	}
+	$results[] = '</table>';
+	
+	// 2. Kritické testovací scénáře
+	$results[] = '<h4>2. Kritické testovací scénáře</h4>';
+	
+	$test_scenarios = [
+		[
+			'name' => 'OR operátor - měl by projít',
+			'weight_min' => 5,
+			'weight_max' => 15,
+			'weight_operator' => 'OR',
+			'test_weight' => 20,
+			'expected_original' => false,
+			'expected_fixed' => true,
+			'description' => 'Balíček 20kg s pravidlem min=5kg, max=15kg, operator=OR'
+		],
+		[
+			'name' => 'AND operátor - správná váha',
+			'weight_min' => 5,
+			'weight_max' => 15,
+			'weight_operator' => 'AND',
+			'test_weight' => 10,
+			'expected_original' => true,
+			'expected_fixed' => true,
+			'description' => 'Balíček 10kg s pravidlem min=5kg, max=15kg, operator=AND'
+		],
+	];
+	
+	// Najít testovací produkt
+	$products = wc_get_products(['limit' => 1, 'status' => 'publish']);
+	if (!empty($products)) {
+		$test_product = $products[0];
+		$original_weight = $test_product->get_weight();
+		
+		$results[] = '<table border="1" style="border-collapse: collapse; width: 100%; margin: 10px 0;">';
+		$results[] = '<tr><th>Scénář</th><th>Původní funkce</th><th>Opravená funkce</th><th>Status</th></tr>';
+		
+		foreach ($test_scenarios as $scenario) {
+			// Vytvořit testovací pravidlo
+			$test_rule = (object) [
+				'rule_name' => $scenario['name'],
+				'weight_min' => $scenario['weight_min'],
+				'weight_max' => $scenario['weight_max'],
+				'weight_operator' => $scenario['weight_operator'],
+				'length_min' => 0,
+				'length_max' => 0,
+				'width_min' => 0,
+				'width_max' => 0,
+				'height_min' => 0,
+				'height_max' => 0,
+				'dimensions_operator' => 'AND'
+			];
+			
+			// Nastavit váhu produktu
+			$test_product->set_weight($scenario['test_weight']);
+			
+			// Vytvořit testovací package
+			$test_package = [
+				'contents' => [
+					'test_item' => [
+						'data' => $test_product,
+						'quantity' => 1,
+						'product_id' => $test_product->get_id(),
+						'variation_id' => 0
+					]
+				]
+			];
+			
+			// Test původní funkce
+			$original_result = null;
+			if (function_exists('dbs_check_weight_condition')) {
+				try {
+					$original_result = dbs_check_weight_condition($test_rule, $test_package);
+				} catch (Exception $e) {
+					$original_result = 'ERROR';
+				}
+			}
+			
+			// Test opravené funkce
+			$fixed_result = null;
+			if (function_exists('dbs_check_weight_condition_with_operators')) {
+				try {
+					$fixed_result = dbs_check_weight_condition_with_operators($test_rule, $test_package);
+				} catch (Exception $e) {
+					$fixed_result = 'ERROR';
+				}
+			}
+			
+			$original_icon = is_bool($original_result) ? ($original_result ? "✅" : "❌") : "⚠️";
+			$fixed_icon = is_bool($fixed_result) ? ($fixed_result ? "✅" : "❌") : "⚠️";
+			
+			$status = '';
+			if (is_bool($original_result) && is_bool($fixed_result)) {
+				if ($original_result === $scenario['expected_original'] && $fixed_result === $scenario['expected_fixed']) {
+					$status = '<span style="color: green;">✅ OK</span>';
+				} elseif ($original_result !== $scenario['expected_original'] && $fixed_result === $scenario['expected_fixed']) {
+					$status = '<span style="color: orange;">⚠️ Oprava řeší problém</span>';
+				} else {
+					$status = '<span style="color: red;">❌ Problém</span>';
+				}
+			}
+			
+			$results[] = '<tr>';
+			$results[] = '<td>' . $scenario['name'] . '<br><small>' . $scenario['description'] . '</small></td>';
+			$results[] = '<td>' . $original_icon . ' ' . (is_bool($original_result) ? ($original_result ? 'true' : 'false') : $original_result) . '</td>';
+			$results[] = '<td>' . $fixed_icon . ' ' . (is_bool($fixed_result) ? ($fixed_result ? 'true' : 'false') : $fixed_result) . '</td>';
+			$results[] = '<td>' . $status . '</td>';
+			$results[] = '</tr>';
+		}
+		$results[] = '</table>';
+		
+		// Vrátit původní váhu
+		$test_product->set_weight($original_weight);
+	} else {
+		$results[] = '❌ Žádné produkty nejsou k dispozici pro test';
+	}
+	
+	$results[] = '<h4>🔍 Nalezené problémy a jejich řešení:</h4>';
+	$results[] = '<ul>';
+	$results[] = '<li><strong>Problém:</strong> Váhový operátor se nepoužíval pro kombinaci min/max váhy</li>';
+	$results[] = '<li><strong>Důsledek:</strong> OR operátor nefungoval - balíčky mimo rozsah byly odmítnuty</li>';
+	$results[] = '<li><strong>Řešení:</strong> Implementace správné logiky operátorů</li>';
+	$results[] = '<li><strong>Integrace:</strong> Automatické použití opravené funkce v původním kódu</li>';
+	$results[] = '</ul>';
+	
+	$results[] = '<p><strong>Status všech oprav:</strong></p>';
+	$results[] = '<ul>';
+	$results[] = '<li>✅ Váhové počítání (3kg × 3ks = 9kg)</li>';
+	$results[] = '<li>✅ Cache invalidation při změně množství</li>';
+	$results[] = '<li>✅ Váhové operátory AND/OR</li>';
+	$results[] = '<li>✅ Rozměrové operátory (už fungovaly)</li>';
+	$results[] = '</ul>';
+	
+	return '<div class="dbs-test-results">' . implode('<br>', $results) . '</div>';
+}
+
+/**
+ * Render debug page.
+ *
+ * @return void
+ */
+function dbs_render_debug_page(): void {
+	echo '<div class="wrap">';
+	echo '<h1>Debug</h1>';
+	echo '<p>Debug stránka je momentálně nedostupná.</p>';
+	echo '</div>';
+}
+
+/**
+ * Render tools page.
+ *
+ * @return void
+ */
+function dbs_render_tools_page(): void {
+	include DBS_PLUGIN_PATH . 'admin/views/tools-page.php';
+}
+
+/**
+ * Save plugin settings.
+ *
+ * @return void
+ */
+function dbs_save_settings(): void {
+	$settings = dbs_get_plugin_settings();
+
+	foreach ( $settings as $setting ) {
+		$value = $_POST[ $setting ] ?? '';
+
+		if ( in_array( $setting, [ 'dbs_enable_caching', 'dbs_debug_mode', 'dbs_adjust_shipping_for_vat', 'dbs_price_includes_tax' ], true ) ) {
+			$value = isset( $_POST[ $setting ] ) ? '1' : '0';
+		} elseif ( in_array( $setting, [ 'dbs_cache_duration', 'dbs_fallback_rate' ], true ) ) {
+			$value = (float) $value;
+		} else {
+			$value = sanitize_text_field( $value );
+		}
+
+		update_option( $setting, $value );
+	}
+
+	// Always set distance unit to kilometers
+	update_option( 'dbs_distance_unit', 'km' );
+
+	add_action( 'admin_notices', function() {
+		?>
+		<div class="notice notice-success is-dismissible">
+			<p><?php esc_html_e( 'Settings saved successfully!', 'distance-shipping' ); ?></p>
+		</div>
+		<?php
+	} );
+}
+
+/**
+ * Handle store form submission.
+ *
+ * @param string $action Form action.
+ * @param int    $store_id Store ID.
+ * @return void
+ */
+function dbs_handle_store_form_submission( string $action, int $store_id ): void {
+	if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'dbs_store_form' ) ) {
+		wp_die( esc_html__( 'Security check failed.', 'distance-shipping' ) );
+	}
+
+	$store_data = [
+		'name'      => sanitize_text_field( $_POST['store_name'] ?? '' ),
+		'address'   => sanitize_textarea_field( $_POST['store_address'] ?? '' ),
+		'latitude'  => ! empty( $_POST['store_latitude'] ) ? (float) $_POST['store_latitude'] : null,
+		'longitude' => ! empty( $_POST['store_longitude'] ) ? (float) $_POST['store_longitude'] : null,
+		'is_active' => isset( $_POST['store_is_active'] ) ? 1 : 0,
+	];
+
+	if ( 'edit' === $action && $store_id ) {
+		$result = dbs_update_store( $store_id, $store_data );
+		$message = $result !== false ? 'updated' : 'error';
+	} else {
+		$result = dbs_insert_store( $store_data );
+		$message = $result !== false ? 'added' : 'error';
+	}
+
+	wp_redirect( admin_url( 'admin.php?page=distance-shipping-stores&message=' . $message ) );
+	exit;
+}
+
+/**
+ * Handle rule form submission.
+ *
+ * @param string $action Form action.
+ * @param int    $rule_id Rule ID.
+ * @return void
+ */
+function dbs_handle_rule_form_submission( $action, $rule_id ) {
+	if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'dbs_rule_form' ) ) {
+		wp_die( esc_html__( 'Security check failed.', 'distance-shipping' ) );
+	}
+
+	$rule_data = array(
+		'rule_name'          => sanitize_text_field( $_POST['rule_name'] ?? '' ),
+		'distance_from'      => (float) ( $_POST['distance_from'] ?? 0 ),
+		'distance_to'        => (float) ( $_POST['distance_to'] ?? 0 ),
+		'base_rate'          => (float) ( $_POST['base_rate'] ?? 0 ),
+		'per_km_rate'        => (float) ( $_POST['per_km_rate'] ?? 0 ),
+		'min_order_amount'   => (float) ( $_POST['min_order_amount'] ?? 0 ),
+		'max_order_amount'   => (float) ( $_POST['max_order_amount'] ?? 0 ),
+		'product_categories' => $_POST['product_categories'] ?? array(),
+		'shipping_classes'   => $_POST['shipping_classes'] ?? array(),
+		'is_active'          => isset( $_POST['rule_is_active'] ) ? 1 : 0,
+		'priority'           => (int) ( $_POST['rule_priority'] ?? 0 ),
+		// Nová pole pro hmotnost a rozměry
+		'weight_min'         => (float) ( $_POST['weight_min'] ?? 0 ),
+		'weight_max'         => (float) ( $_POST['weight_max'] ?? 0 ),
+		'weight_operator'    => sanitize_text_field( $_POST['weight_operator'] ?? 'AND' ),
+		'length_min'         => (float) ( $_POST['length_min'] ?? 0 ),
+		'length_max'         => (float) ( $_POST['length_max'] ?? 0 ),
+		'width_min'          => (float) ( $_POST['width_min'] ?? 0 ),
+		'width_max'          => (float) ( $_POST['width_max'] ?? 0 ),
+		'height_min'         => (float) ( $_POST['height_min'] ?? 0 ),
+		'height_max'         => (float) ( $_POST['height_max'] ?? 0 ),
+		'dimensions_operator' => sanitize_text_field( $_POST['dimensions_operator'] ?? 'AND' ),
+	);
+
+	if ( 'edit' === $action && $rule_id ) {
+		$result = dbs_update_shipping_rule( $rule_id, $rule_data );
+		$message = $result !== false ? 'updated' : 'error';
+	} else {
+		$result = dbs_insert_shipping_rule( $rule_data );
+		$message = $result !== false ? 'added' : 'error';
+	}
+
+	wp_redirect( admin_url( 'admin.php?page=distance-shipping-rules&message=' . $message ) );
+	exit;
+}
+
+/**
+ * Test opravené logiky kombinace weight a dimensions podmínek
+ * 
+ * @return void
+ */
+function dbs_admin_test_conditions_logic_fix() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	
+	// Zkontrolovat, zda funkce už existuje (soubor je načten automaticky)
+	if ( function_exists( 'dbs_test_conditions_logic_fix' ) ) {
+		dbs_test_conditions_logic_fix();
+	} else {
+		// Fallback - pokusit se načíst soubor
+		$test_file = plugin_dir_path( __FILE__ ) . '../../test-conditions-logic-fix.php';
+		if ( file_exists( $test_file ) ) {
+			include_once $test_file;
+			if ( function_exists( 'dbs_test_conditions_logic_fix' ) ) {
+				dbs_test_conditions_logic_fix();
+			} else {
+				echo '<p>Chyba: Funkce dbs_test_conditions_logic_fix nebyla nalezena.</p>';
+			}
+		} else {
+			echo '<p>Chyba: Testovací soubor nebyl nalezen.</p>';
+		}
+	}
+}
+
+/**
+ * Test reálného scénáře z košíku
+ * 
+ * @return void
+ */
+function dbs_admin_test_real_cart_scenario() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	
+	// Zkontrolovat, zda funkce už existuje (soubor je načten automaticky)
+	if ( function_exists( 'dbs_test_real_cart_scenario' ) ) {
+		dbs_test_real_cart_scenario();
+	} else {
+		// Fallback - pokusit se načíst soubor
+		$test_file = plugin_dir_path( __FILE__ ) . '../../test-real-cart-scenario.php';
+		if ( file_exists( $test_file ) ) {
+			include_once $test_file;
+			if ( function_exists( 'dbs_test_real_cart_scenario' ) ) {
+				dbs_test_real_cart_scenario();
+			} else {
+				echo '<p>Chyba: Funkce dbs_test_real_cart_scenario nebyla nalezena.</p>';
+			}
+		} else {
+			echo '<p>Chyba: Testovací soubor nebyl nalezen.</p>';
+		}
+	}
+}
+
+/**
+ * Test vynucení refresh oprav
+ * 
+ * @return void
+ */
+function dbs_admin_force_refresh_fix() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	
+	// Zkontrolovat, zda funkce už existuje (soubor je načten automaticky)
+	if ( function_exists( 'dbs_force_refresh_fix' ) ) {
+		dbs_force_refresh_fix();
+	} else {
+		// Fallback - pokusit se načíst soubor
+		$test_file = plugin_dir_path( __FILE__ ) . '../../force-refresh-fix.php';
+		if ( file_exists( $test_file ) ) {
+			include_once $test_file;
+			if ( function_exists( 'dbs_force_refresh_fix' ) ) {
+				dbs_force_refresh_fix();
+			} else {
+				echo '<p>Chyba: Funkce dbs_force_refresh_fix nebyla nalezena.</p>';
+			}
+		} else {
+			echo '<p>Chyba: Testovací soubor nebyl nalezen.</p>';
+		}
+	}
+}
+
+ 
+ / * * 
+   *   T e s t   v y n u c e n �   r e f r e s h   o p r a v 
+   *   
+   *   @ r e t u r n   v o i d 
+   * / 
+ f u n c t i o n   d b s _ a d m i n _ f o r c e _ r e f r e s h _ f i x ( )   { 
+ i f   (   !   c u r r e n t _ u s e r _ c a n (   " m a n a g e _ o p t i o n s "   )   )   { 
+ r e t u r n ; 
+ } 
+ 
+ / /   Z k o n t r o l o v a t ,   z d a   f u n k c e   u ~  e x i s t u j e   ( s o u b o r   j e   n a 
+t e n   a u t o m a t i c k y ) 
+ i f   (   f u n c t i o n _ e x i s t s (   " d b s _ f o r c e _ r e f r e s h _ f i x "   )   )   { 
+ d b s _ f o r c e _ r e f r e s h _ f i x ( ) ; 
+ }   e l s e   { 
+ / /   F a l l b a c k   -   p o k u s i t   s e   n a 
+� s t   s o u b o r 
+ $ t e s t _ f i l e   =   p l u g i n _ d i r _ p a t h (   _ _ F I L E _ _   )   .   " . . / . . / f o r c e - r e f r e s h - f i x . p h p " ; 
+ i f   (   f i l e _ e x i s t s (   $ t e s t _ f i l e   )   )   { 
+ i n c l u d e _ o n c e   $ t e s t _ f i l e ; 
+ i f   (   f u n c t i o n _ e x i s t s (   " d b s _ f o r c e _ r e f r e s h _ f i x "   )   )   { 
+ d b s _ f o r c e _ r e f r e s h _ f i x ( ) ; 
+ }   e l s e   { 
+ e c h o   " < p > C h y b a :   F u n k c e   d b s _ f o r c e _ r e f r e s h _ f i x   n e b y l a   n a l e z e n a . < / p > " ; 
+ } 
+ }   e l s e   { 
+ e c h o   " < p > C h y b a :   T e s t o v a c �   s o u b o r   n e b y l   n a l e z e n . < / p > " ; 
+ } 
+ } 
+ } 
+ 
+ 

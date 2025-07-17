@@ -1,0 +1,419 @@
+/**
+ * Checkout Calculator Styles
+ * 
+ * @package Distance_Based_Shipping
+ * @since 1.0.0
+ */
+
+/* Checkout Calculator Container */
+.dbs-checkout-calculator {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dbs-checkout-calculator .dbs-calculator-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dbs-checkout-calculator .dbs-calculator-header h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.dbs-checkout-calculator .dbs-saved-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: #666;
+}
+
+.dbs-checkout-calculator .dbs-saved-address {
+    font-weight: 500;
+    color: #333;
+}
+
+.dbs-checkout-calculator .dbs-saved-distance {
+    color: #666;
+}
+
+.dbs-checkout-calculator .dbs-saved-cost {
+    font-weight: 600;
+    color: #28a745;
+}
+
+/* Form Elements */
+.dbs-checkout-calculator .dbs-calculator-form {
+    margin-bottom: 20px;
+}
+
+.dbs-checkout-calculator .dbs-form-group {
+    margin-bottom: 15px;
+}
+
+.dbs-checkout-calculator .dbs-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.dbs-checkout-calculator .dbs-address-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.dbs-checkout-calculator .dbs-address-input:focus {
+    outline: none;
+    border-color: #007cba;
+    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.2);
+}
+
+.dbs-checkout-calculator .dbs-address-input::placeholder {
+    color: #999;
+}
+
+/* Address Suggestions */
+.dbs-checkout-calculator .dbs-address-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dbs-checkout-calculator .dbs-address-suggestion {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.dbs-checkout-calculator .dbs-address-suggestion:hover {
+    background-color: #f8f9fa;
+}
+
+.dbs-checkout-calculator .dbs-address-suggestion:last-child {
+    border-bottom: none;
+}
+
+/* Calculate Button */
+.dbs-checkout-calculator .dbs-calculate-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: #007cba;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: relative;
+    min-height: 44px;
+}
+
+.dbs-checkout-calculator .dbs-calculate-btn:hover {
+    background: #005a87;
+}
+
+.dbs-checkout-calculator .dbs-calculate-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.dbs-checkout-calculator .dbs-btn-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.dbs-checkout-calculator .dbs-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: dbs-spin 1s linear infinite;
+}
+
+@keyframes dbs-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Calculator Result */
+.dbs-checkout-calculator .dbs-calculator-result {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.dbs-checkout-calculator .dbs-result-content {
+    margin-bottom: 15px;
+}
+
+.dbs-checkout-calculator .dbs-distance-info,
+.dbs-checkout-calculator .dbs-cost-info,
+.dbs-checkout-calculator .dbs-delivery-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.dbs-checkout-calculator .dbs-distance-info:last-child,
+.dbs-checkout-calculator .dbs-cost-info:last-child,
+.dbs-checkout-calculator .dbs-delivery-info:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.dbs-checkout-calculator .dbs-distance-label,
+.dbs-checkout-calculator .dbs-cost-label,
+.dbs-checkout-calculator .dbs-delivery-label {
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.dbs-checkout-calculator .dbs-distance-value,
+.dbs-checkout-calculator .dbs-cost-value,
+.dbs-checkout-calculator .dbs-delivery-value {
+    font-weight: 600;
+    color: #007cba;
+    font-size: 14px;
+}
+
+.dbs-checkout-calculator .dbs-cost-value {
+    color: #28a745;
+    font-size: 16px;
+}
+
+/* Result Actions */
+.dbs-checkout-calculator .dbs-result-actions {
+    text-align: center;
+}
+
+.dbs-checkout-calculator .dbs-apply-shipping-btn {
+    padding: 10px 20px;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dbs-checkout-calculator .dbs-apply-shipping-btn:hover {
+    background: #218838;
+}
+
+/* Error Messages */
+.dbs-checkout-calculator .dbs-calculator-error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 15px;
+    color: #721c24;
+}
+
+.dbs-checkout-calculator .dbs-error-message {
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Success Messages */
+.dbs-checkout-calculator .dbs-success-message {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    color: #155724;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Checkout Shipping Info */
+.dbs-checkout-shipping-info {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.dbs-checkout-shipping-info .dbs-shipping-details h4 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.dbs-checkout-shipping-info .dbs-shipping-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.dbs-checkout-shipping-info .dbs-shipping-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.dbs-checkout-shipping-info .dbs-label {
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.dbs-checkout-shipping-info .dbs-value {
+    font-weight: 600;
+    color: #007cba;
+    font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dbs-checkout-calculator {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .dbs-checkout-calculator .dbs-calculator-header h3 {
+        font-size: 16px;
+    }
+    
+    .dbs-checkout-calculator .dbs-saved-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .dbs-checkout-calculator .dbs-distance-info,
+    .dbs-checkout-calculator .dbs-cost-info,
+    .dbs-checkout-calculator .dbs-delivery-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .dbs-checkout-shipping-info .dbs-shipping-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dbs-checkout-calculator {
+        padding: 12px;
+    }
+    
+    .dbs-checkout-calculator .dbs-calculate-btn {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .dbs-checkout-calculator .dbs-address-input {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+}
+
+/* WooCommerce Integration */
+.woocommerce-checkout .dbs-checkout-calculator {
+    margin-bottom: 20px;
+}
+
+.woocommerce-checkout .dbs-checkout-shipping-info {
+    margin-bottom: 20px;
+}
+
+/* Avada Theme Compatibility */
+.avada-checkout .dbs-checkout-calculator {
+    border-radius: 4px;
+}
+
+.avada-checkout .dbs-checkout-calculator .dbs-calculate-btn {
+    background: var(--primary-color, #007cba);
+}
+
+.avada-checkout .dbs-checkout-calculator .dbs-calculate-btn:hover {
+    background: var(--primary-color-hover, #005a87);
+}
+
+/* Loading States */
+.dbs-checkout-calculator.dbs-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.dbs-checkout-calculator.dbs-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #007cba;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: dbs-spin 1s linear infinite;
+    z-index: 1000;
+}
+
+/* Focus States */
+.dbs-checkout-calculator .dbs-address-input:focus {
+    border-color: var(--primary-color, #007cba);
+    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.2);
+}
+
+/* Accessibility */
+.dbs-checkout-calculator .dbs-calculate-btn:focus,
+.dbs-checkout-calculator .dbs-apply-shipping-btn:focus {
+    outline: 2px solid #007cba;
+    outline-offset: 2px;
+}
+
+.dbs-checkout-calculator .dbs-address-suggestion:focus {
+    background-color: #f8f9fa;
+    outline: 2px solid #007cba;
+    outline-offset: -2px;
+} 

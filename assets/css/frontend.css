@@ -1,0 +1,942 @@
+/**
+ * Frontend CSS pro Distance Based Shipping plugin.
+ *
+ * Soubor: assets/css/frontend.css
+ */
+
+/* Základní styly pro shipping kalkulátor */
+.dbs-shipping-calculator {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Styly pro postovne-checker shortcode */
+.dbs-postovne-checker {
+  background: white;
+  border: none;
+  border-radius: 12px;
+  padding: 25px;
+  margin: 25px 0;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  color: white;
+}
+
+.dbs-postovne-checker .dbs-calculator-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.dbs-postovne-checker .dbs-calculator-title {
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dbs-postovne-checker .dbs-calculator-description {
+  color: gray;
+  font-size: 16px;
+  margin: 0;
+  font-weight: 300;
+}
+
+.dbs-postovne-checker .dbs-calculator-field label {
+  
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.dbs-postovne-checker .dbs-address-input {
+  background: rgba(255, 255, 255, 0.95);
+  border:2px solid rgb(149 149 149 / 30%);
+  border-radius: 8px;
+  padding: 15px;
+  font-size: 16px;
+  color: #333;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.dbs-postovne-checker .dbs-address-input:focus {
+  background: white;
+  border-color: #ffd700;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.dbs-postovne-checker .dbs-field-help {
+  margin-top: 8px;
+}
+
+.dbs-postovne-checker .dbs-field-help small {
+  color: gray;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.dbs-postovne-checker .dbs-calculator-actions {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.dbs-postovne-checker .dbs-calculator-button {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #333;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.dbs-postovne-checker .dbs-calculator-button:hover {
+  background: linear-gradient(45deg, #ffed4e, #ffd700);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+}
+
+.dbs-postovne-checker .dbs-calculator-button:disabled {
+  background: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.dbs-postovne-checker .dbs-button-icon {
+  font-size: 18px;
+}
+
+.dbs-postovne-checker .dbs-button-text {
+  font-weight: 600;
+}
+
+.dbs-postovne-checker .dbs-shipping-results {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 8px;
+  margin-top: 25px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dbs-postovne-checker .dbs-shipping-results h4 {
+  color: #333;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 15px 0;
+}
+
+.dbs-postovne-checker .dbs-shipping-info {
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.dbs-postovne-checker .dbs-shipping-info p {
+  color: #333;
+  font-size: 14px;
+  margin: 5px 0;
+  font-weight: 500;
+}
+
+.dbs-postovne-checker .dbs-shipping-rate {
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 8px;
+  padding: 15px;
+  margin: 15px 0;
+  transition: all 0.3s ease;
+}
+
+.dbs-postovne-checker .dbs-shipping-rate:hover {
+  border-color: #ffd700;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dbs-postovne-checker .dbs-shipping-rate h5 {
+  color: #333;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+}
+
+.dbs-postovne-checker .dbs-rate-cost,
+.dbs-postovne-checker .dbs-rate-distance {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 5px 0;
+}
+
+.dbs-postovne-checker .dbs-calculator-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dbs-postovne-checker .dbs-calculator-note {
+  color:gray;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* Responsive design pro postovne-checker */
+@media (max-width: 768px) {
+  .dbs-postovne-checker {
+    padding: 20px;
+    margin: 15px 0;
+  }
+  
+  .dbs-postovne-checker .dbs-calculator-title {
+    font-size: 20px;
+  }
+  
+  .dbs-postovne-checker .dbs-calculator-description {
+    font-size: 14px;
+  }
+  
+  .dbs-postovne-checker .dbs-calculator-button {
+    padding: 12px 25px;
+    font-size: 14px;
+    min-width: 180px;
+  }
+  
+  .dbs-postovne-checker .dbs-address-input {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+.dbs-shipping-calculator h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.dbs-calculator-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.dbs-calculator-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.dbs-calculator-field label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.dbs-calculator-field input,
+.dbs-calculator-field textarea,
+.dbs-address-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.dbs-calculator-field input:focus,
+.dbs-calculator-field textarea:focus,
+.dbs-address-input:focus {
+  outline: none;
+  border-color: #0073aa;
+  box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.2);
+}
+
+.dbs-address-input.invalid {
+  border-color: #dc3232;
+}
+
+.dbs-calculator-button {
+  background: #0073aa;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+}
+
+.dbs-calculator-button:hover {
+  background: #005a87;
+}
+
+.dbs-calculator-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Výsledky kalkulátoru */
+.dbs-shipping-results {
+  margin-top: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 4px;
+  border-left: 4px solid #0073aa;
+}
+
+.dbs-shipping-results h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.dbs-shipping-info {
+  background: #f0f8ff;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.dbs-shipping-info p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.dbs-shipping-rates {
+  margin-top: 15px;
+}
+
+.dbs-shipping-rate {
+  background: #f9f9f9;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  border-left: 3px solid #0073aa;
+}
+
+.dbs-shipping-rate h5 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dbs-rate-cost,
+.dbs-rate-distance {
+  margin: 5px 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.dbs-no-rates {
+  color: #dc3232;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Address standardization info */
+.dbs-address-standardization {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 15px;
+}
+
+.dbs-address-standardization h5 {
+  margin: 0 0 8px 0;
+  color: #856404;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dbs-address-standardization p {
+  margin: 5px 0;
+    font-size: 13px;
+  color: #856404;
+}
+
+/* Checkout integration */
+.dbs-checkout-shipping-info {
+  background: #f0f8ff;
+  border: 1px solid #0073aa;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 2px 4px rgba(0, 115, 170, 0.1);
+}
+
+.dbs-checkout-shipping-info h3 {
+  margin: 0 0 15px 0;
+  color: #0073aa;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dbs-shipping-details p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.dbs-shipping-details strong {
+  color: #0073aa;
+}
+
+/* Notices */
+.dbs-notice {
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.dbs-notice.info {
+  background: #d1ecf1;
+  border: 1px solid #bee5eb;
+  color: #0c5460;
+}
+
+.dbs-notice.success {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.dbs-notice.error {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.dbs-notice.warning {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+}
+
+/* Spinner */
+.dbs-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: dbs-spin 1s ease-in-out infinite;
+  margin-right: 8px;
+}
+
+@keyframes dbs-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Distance method enhancement */
+.dbs-distance-method {
+  position: relative;
+}
+
+.dbs-distance-info {
+  display: inline-block;
+  background: #0073aa;
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Zpráva o vybrané shipping metodě */
+.dbs-shipping-method-selected {
+    background: #f0f8ff;
+    border: 1px solid #0073aa;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 10px 0;
+    color: #333;
+}
+
+.dbs-shipping-method-selected p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.dbs-shipping-method-selected strong {
+    color: #0073aa;
+}
+
+/* Deaktivované shipping metody */
+.woocommerce-shipping-methods input[type="radio"]:disabled + label {
+    opacity: 0.5;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Animace pro automatické vyplnění */
+.dbs-address-auto-filled {
+    animation: highlightField 2s ease-in-out;
+}
+
+@keyframes highlightField {
+    0% { background-color: #fff3cd; }
+    50% { background-color: #d4edda; }
+    100% { background-color: transparent; }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .dbs-shipping-calculator,
+  .dbs-checkout-shipping-info {
+    padding: 15px;
+    margin: 15px 0;
+  }
+
+  .dbs-calculator-form {
+    gap: 10px;
+  }
+
+  .dbs-calculator-button {
+    padding: 10px 15px;
+    font-size: 13px;
+  }
+
+  .dbs-shipping-results {
+    padding: 10px;
+  }
+
+  .dbs-shipping-rate {
+    padding: 8px;
+    margin: 8px 0;
+  }
+}
+
+/* WooCommerce integration */
+
+
+.woocommerce-checkout .dbs-checkout-shipping-info {
+  margin-bottom: 30px;
+}
+
+/* Avada theme compatibility */
+.fusion-form .dbs-shipping-calculator {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.fusion-button.dbs-calculator-button {
+  background: var(--fusion-primary-color, #0073aa);
+}
+
+.fusion-button.dbs-calculator-button:hover {
+  background: var(--fusion-primary-hover-color, #005a87);
+}
+
+/* Accessibility improvements */
+.dbs-calculator-button:focus {
+  outline: 2px solid #0073aa;
+  outline-offset: 2px;
+}
+
+.dbs-address-input:focus {
+  outline: 2px solid #0073aa;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .dbs-shipping-calculator,
+  .dbs-cart-shipping-calculator,
+  .dbs-checkout-shipping-info {
+    border-width: 2px;
+  }
+
+  .dbs-calculator-button,
+  .dbs-calculate-shipping-btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .dbs-spinner {
+    animation: none;
+  }
+
+  .dbs-calculator-button,
+  .dbs-calculate-shipping-btn,
+  .dbs-calculator-field input,
+  .dbs-calculator-field textarea,
+  .dbs-address-input {
+    transition: none;
+  }
+}
+
+/* Zpráva o vypočítané dopravě na cart stránce */
+.dbs-cart-shipping-message {
+    background: #f0f8ff;
+    border: 1px solid #0073aa;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 10px 0;
+    color: #333;
+}
+
+.dbs-cart-shipping-message p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.dbs-cart-shipping-message strong {
+    color: #0073aa;
+}
+
+.dbs-cart-shipping-message em {
+    color: #666;
+    font-style: italic;
+}
+
+/* Nové styly pro cart status komponenty */
+.dbs-cart-shipping-status {
+  margin: 15px 0;
+}
+
+.dbs-cart-status-success {
+  background: #f0f8ff;
+  border: 2px solid #4CAF50;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+}
+
+.dbs-status-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.dbs-status-icon {
+  font-size: 18px;
+}
+
+.dbs-status-header strong {
+  color: #4CAF50;
+  font-size: 16px;
+}
+
+.dbs-status-details p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.dbs-status-details strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.dbs-status-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dbs-change-address-btn,
+.dbs-remove-shipping-btn {
+  background: #007cba;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dbs-change-address-btn:hover {
+  background: #005a87;
+  transform: translateY(-1px);
+}
+
+.dbs-remove-shipping-btn {
+  background: #dc3545;
+}
+
+.dbs-remove-shipping-btn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+/* Loading a success/error zprávy */
+.dbs-cart-loading {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+  text-align: center;
+  color: #856404;
+}
+
+.dbs-cart-success {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+  color: #155724;
+}
+
+.dbs-cart-error {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+  color: #721c24;
+}
+
+/* Vylepšené tlačítko s loading stavem */
+.dbs-calculator-button .dbs-button-text,
+.dbs-calculator-button .dbs-spinner {
+  display: inline-block;
+}
+
+.dbs-calculator-button .dbs-spinner {
+  display: none;
+  animation: dbs-spin 1s linear infinite;
+}
+
+/* Responsivní styly pro cart komponenty */
+@media (max-width: 768px) {
+  .dbs-status-actions {
+    flex-direction: column;
+  }
+  
+  .dbs-change-address-btn,
+  .dbs-remove-shipping-btn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .dbs-cart-status-success {
+    padding: 12px;
+  }
+  
+  .dbs-status-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
+
+/* Cart shipping kalkulátor styly */
+.dbs-cart-shipping-calculator-wrapper {
+  margin: 20px 0;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.dbs-cart-shipping-calculator-wrapper .dbs-shipping-calculator {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dbs-cart-shipping-calculator-wrapper .dbs-shipping-calculator h3 {
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 15px 0;
+  border-bottom: 2px solid #007cba;
+  padding-bottom: 10px;
+}
+
+.dbs-cart-shipping-info {
+  background: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 15px 0;
+}
+
+.dbs-cart-shipping-info h3 {
+  color: #005a87;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+}
+
+.dbs-cart-shipping-info .dbs-shipping-details p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.dbs-cart-shipping-info .dbs-shipping-details strong {
+  color: #005a87;
+  font-weight: 600;
+}
+
+/* Responsivní styly pro cart kalkulátor */
+@media (max-width: 768px) {
+  .dbs-cart-shipping-calculator-wrapper {
+    padding: 15px;
+    margin: 15px 0;
+  }
+  
+  .dbs-cart-shipping-calculator-wrapper .dbs-shipping-calculator {
+    padding: 15px;
+  }
+  
+  .dbs-cart-shipping-calculator-wrapper .dbs-shipping-calculator h3 {
+    font-size: 16px;
+  }
+  
+  .dbs-cart-shipping-info {
+    padding: 12px;
+    margin: 12px 0;
+  }
+  
+  .dbs-cart-shipping-info h3 {
+    font-size: 15px;
+  }
+}
+
+/* Auto-calculation komponenty */
+.dbs-address-loading {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+  text-align: center;
+  color: #856404;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.dbs-loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #856404;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: dbs-spin 1s linear infinite;
+}
+
+.dbs-address-validation {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.dbs-address-valid {
+  background: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.dbs-address-invalid {
+  background: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.dbs-validation-icon {
+  font-size: 16px;
+}
+
+.dbs-validation-message {
+  font-weight: 500;
+}
+
+.dbs-auto-calculation-success,
+.dbs-auto-calculation-error {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 10px 15px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dbs-auto-calculation-success {
+  background: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.dbs-auto-calculation-error {
+  background: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.dbs-success-icon,
+.dbs-error-icon {
+  font-size: 16px;
+}
+
+/* Responsivní styly pro auto-calculation */
+@media (max-width: 768px) {
+  .dbs-address-loading,
+  .dbs-address-validation,
+  .dbs-auto-calculation-success,
+  .dbs-auto-calculation-error {
+    padding: 8px 10px;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+  
+  .dbs-validation-icon,
+  .dbs-success-icon,
+  .dbs-error-icon {
+    font-size: 14px;
+  }
+}
+
